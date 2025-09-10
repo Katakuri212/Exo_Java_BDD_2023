@@ -62,8 +62,13 @@
     <%int cpt2 = Integer.parseInt(valeur); %>
     <p>
     <% for (int i = 1; i <= cpt; i++) {%>
-        <% for (int j = 1; j <= cpt2; j++) {%>
-            <%="*"%>
+        <% for (int j = 1; j <= cpt; j++) {%>
+            <% if (j == cpt2 && j <= cpt) {%>
+                <%="*"%>
+                <%}%>
+            <% else {%>
+                <%=" "%>
+                <%}%>
         <%}%>
         <%cpt2 -= 1; %>
         </br>
