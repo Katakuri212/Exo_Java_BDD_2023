@@ -27,7 +27,7 @@
 
 <h2>Exercice 1 : Le carré d'étoiles</h2>
 
-<p>Code ajouté</p>
+<p>Code ajouté exo 1</p>
     <p>
     <% for (int i = 1; i <= cpt; i++) {%>
         <% for (int j = 1; j <= cpt; j++) {%>
@@ -42,7 +42,7 @@
 
 <h2>Exercice 2 : Triangle rectangle gauche</h2>
 
-<p>Code ajouté</p>
+<p>Code ajouté exo 2</p>
     <p>
     <% for (int i = 1; i <= cpt; i++) {%>
         <% for (int j = 1; j <= i; j++) {%>
@@ -57,6 +57,19 @@
 <p>*</br>**</br>***</br>****</br>*****</p>
 
 <h2>Exercice 3 : Triangle rectangle inversé</h2>
+
+<p>Code ajouté exo 3</p>
+    <%int cpt2 = Integer.parseInt(valeur); %>
+    <p>
+    <% for (int i = 1; i <= cpt; i++) {%>
+        <% for (int j = 1; j <= cpt2; j++) {%>
+            <%="*"%>
+        <%}%>
+        <%int cpt2 -= 1; %>
+        </br>
+    <%}%>
+    </p>
+
 <p>Ecrire le code afin de produire un triangle rectangle aligné sur la gauche</p>
 <p>Exemple si l'utilisateur saisie le valeur 5</p>
 <p>*****</br>****</br>***</br>**</br>*</p>
