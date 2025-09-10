@@ -28,11 +28,8 @@
 <h2>Exercice 1 : Le carré d'étoiles</h2>
 
 <%-- Boucle for pour afficher une ligne d'étoiles --%>
-    <p>
     <% for (int i = 1; i <= cpt; i++) { %>
-        <p>non</p>
         <% for (int j = 1; j > cpt; j++) { %>
-            <p>oui</p>
             <%= "*" %>
         </br>
         <% } %>
