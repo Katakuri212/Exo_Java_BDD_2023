@@ -77,7 +77,6 @@
 <h2>Exercice 4 : Triangle rectangle 2</h2>
 
 <p>Code ajouté exo 4</p>
-    <%int cpt2 = Integer.parseInt(valeur); %>
     <p>
     <% for (int i = 1; i <= cpt; i++) {%>
         <% for (int j = 1; j <= cpt; j++) {%>
