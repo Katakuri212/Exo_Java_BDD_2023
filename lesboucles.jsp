@@ -35,6 +35,7 @@
         <% for (int j = 1; j <= cpt; j++) { %>
             <%= "*" %>
         </br>
+        <% } %>
     <% } %>
 
 <p>Exemple si l'utilisateur saisie le valeur 5</p>
