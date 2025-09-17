@@ -69,22 +69,22 @@ Oui C est compris entre A et B</p>
 <h2>Exercice 2 : Pair ou Impair ?</h2>
 <p>Écrivez un programme pour vérifier si un nombre est pair ou impair en utilisant une structure if</p>
 <form action="#" method="post">
-    <p>Saisir la valeur 1 : <input type="text" id="inputValeur" name="valeur1">
+    <p>Saisir la valeur 4 : <input type="text" id="inputValeur" name="valeur4">
     <p><input type="submit" value="Afficher">
 </form>
 <%-- Récupération des valeurs --%>
-    <% String valeur1 = request.getParameter("valeur1"); %>
+    <% String valeur4 = request.getParameter("valeur4"); %>
 
     <%-- Vérification de la condition entre les deux valeurs --%>
-    <% if (valeur1 != null) { %>
+    <% if (valeur4 != null) { %>
         <%-- Conversion des valeurs en entiers pour la comparaison --%>
-        <% int intValeur1 = Integer.parseInt(valeur1); %>
+        <% int intValeur4 = Integer.parseInt(valeur4); %>
         
         <%-- Condition if pour comparer les valeurs --%>
-        <% if ((intValeur1%2) == 0) { %>
-            <p>Valeur 1 est pair.</p>
+        <% if ((intValeur4%2) == 0) { %>
+            <p>Valeur 4 est pair.</p>
         <% } else { %>
-            <p>Valeur 1 est impair.</p>
+            <p>Valeur 4 est impair.</p>
         <% } %>
   <% } %> 
 <p><a href="index.html">Retour au sommaire</a></p>
