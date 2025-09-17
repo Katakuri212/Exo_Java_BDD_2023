@@ -13,6 +13,7 @@
 <%-- Récupération des valeurs --%>
     <% String valeur1 = request.getParameter("valeur1"); %>
     <% String valeur2 = request.getParameter("valeur2"); %>
+    <% String valeur3 = request.getParameter("valeur3"); %>
 
     <%-- Vérification de la condition entre les deux valeurs --%>
     <% if (valeur1 != null && valeur2 != null) { %>
@@ -38,7 +39,24 @@ A = 10</br>
 B = 20</br>
 C = 15</br>
 Oui C est compris entre A et B</p>
+<%-- Récupération des valeurs --%>
+    <% String A = request.getParameter("A"); %>
+    <% String B = request.getParameter("B"); %>
+    <% String C = request.getParameter("C"); %>
 
+    <%-- Vérification de la condition entre les deux valeurs --%>
+    <% if (A != null && B != null && C != null) { %>
+        <%-- Conversion des valeurs en entiers pour la comparaison --%>
+        <% int intA = Integer.parseInt(A); %>
+        <% int intB = Integer.parseInt(B); %>
+        <% int intC = Integer.parseInt(C); %>
+        
+        <%-- Condition if pour comparer les valeurs --%>
+        <% if (intA > intC > intB || intB > intC > intA) { %>
+            <p>Oui C est compris entre A et B</p>
+        <% } else { %>
+            <p>Non C n'est pas compris entre A et B</p>
+        <% } %>
 <h2>Exercice 2 : Pair ou Impair ?</h2>
 <p>Écrivez un programme pour vérifier si un nombre est pair ou impair en utilisant une structure if</p>
 
