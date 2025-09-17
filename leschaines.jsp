@@ -34,6 +34,14 @@
     
 <h2>Exercice 1 : Combien de 'e' dans notre chaine de charactère ?</h2>
 <p>Ecrire un programme pour compter le nombre de lettre e dans votre chaine de charactères</p>
+<%-- Compteur de lettre --%>
+<% int CompteurLettre = 0; %>
+<%for (int i = 1; i <= longueurChaine; i++) {%>
+    <%if (chaine.charAt(i) == "e") {%>
+    <%CompteurLettre += 1 %>
+    <%}%>
+<%}%>
+<p>La lettre "e" est afficher <%= CompteurLettre %> fois dans la chaine de caractère</p>
 
 <h2>Exercice 2 : Affichage verticale</h2>
 <p>Ecrire le programme pour afficher le texte en vertical</br>
