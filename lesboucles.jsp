@@ -153,6 +153,12 @@
 <p>*****</br>&nbsp;&nbsp;****</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</p>
 
 <h2>Exercice 7 : La table de multiplication</h2>
+<%-- Boucle for pour afficher une table de multiplication --%>
+    <p>
+    <% for (int i = 1; i <= cpt; i++) { %>
+        <%= cpt %> x <%= i %> = <%= (cpt * i) %> <br/>
+    <% } %>
+    </p>
 <p>Ecrire le code afin de créser une table de multiplication</p>
 <p>Exemple si l'utilisateur saisie le valeur 5</p>
 <p>5 x 1 = 5</p>
