@@ -79,18 +79,18 @@
 <p>Code ajouté exo 4</p>
     <%int cpt3 = Integer.parseInt(valeur); %>
     <p>
-    <% for (int i = 1; i <= cpt; i++) {%>
-        <% for (int j = 1; j <= cpt; j++) {%>
-            <% if (j >= cpt3 && j <= cpt){%>
-                <%="*"%>
-            <%}%>
-            <% else{%>
-                &nbsp
-            <%}%>
-        <%}%>
-        <%cpt3 -= 1; %>
-        </br>
-    <%}%>
+    <% for (int i = cpt; i >= 1; i--) { %>
+        <%-- Affichage des espaces --%>
+        <% for (int l = cpt - i; l >= 1; l--) { %>
+            &nbsp;&nbsp;
+        <% } %>
+
+        <%-- Affichage des étoiles --%>
+        <% for (int j = 1; j <= i; j++) { %>
+           <%= "*" %>
+        <% } %>
+    </br>
+    <% } %>
     </p>
 <p>Ecrire le code afin de produire un triangle rectangle aligné sur la droite</p>
 <p>Exemple si l'utilisateur saisie le valeur 5</p>
