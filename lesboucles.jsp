@@ -94,6 +94,7 @@
     </p>
 <p>Ecrire le code afin de produire un triangle rectangle aligné sur la droite</p>
 <p>Exemple si l'utilisateur saisie le valeur 5</p>
+<h2>Exercice 5 : Triangle isocele</h2>
     <p>
     <% for (int i = cpt; i >= 1; i--) { %>
         <%-- Affichage des espaces --%>
@@ -109,7 +110,6 @@
     <% } %>
     </p>
 
-<h2>Exercice 5 : Triangle isocele</h2>
 <p>Ecrire le code afin de produire un triangle rectangle aligné sur la droite</p>
 <p>Exemple si l'utilisateur saisie le valeur 5</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;*</br>&nbsp;&nbsp;&nbsp;**</br>&nbsp;&nbsp;***</br>&nbsp;****</br>*****</p>
