@@ -115,6 +115,38 @@
 <p>&nbsp;&nbsp;&nbsp;&nbsp;*</br>&nbsp;&nbsp;&nbsp;**</br>&nbsp;&nbsp;***</br>&nbsp;****</br>*****</p>
 
 <h2>Exercice 6 : Le demi losange</h2>
+<%-- Boucle for pour afficher un triangle rectangle croissant --%>
+    <p>
+    <% for (int i = 1; i <= cpt; i++) { %>
+        <%-- Affichage des espaces --%>
+        <% for (int l = 1; l <= cpt - i; l++) { %>
+            &nbsp;&nbsp;
+        <% } %>
+
+        <%-- Affichage des étoiles --%>
+        <% for (int j = 1; j <= i; j++) { %>
+           <%= "*" %>
+        <% } %>
+    </br>
+    <% } %>
+    </p>
+
+<%-- Boucle for pour afficher un triangle rectangle décroissant --%>
+    <p>
+    <% for (int i = cpt; i >= 1; i--) { %>
+        <%-- Affichage des espaces --%>
+        <% for (int l = cpt - i; l >= 1; l--) { %>
+            &nbsp;&nbsp;
+        <% } %>
+
+        <%-- Affichage des étoiles --%>
+        <% for (int j = 1; j <= i; j++) { %>
+           <%= "*" %>
+        <% } %>
+    </br>
+    <% } %>
+    </p>
+
 <p>Ecrire le code afin de produire un losange</p>
 <p>Exemple si l'utilisateur saisie le valeur 5</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**</br>&nbsp;&nbsp;&nbsp;&nbsp;***</br>&nbsp;&nbsp;****</br>*****</p>
