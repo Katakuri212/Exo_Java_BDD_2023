@@ -1,11 +1,15 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<% request.setCharacterEncoding("UTF-8"); %>
+<%
+    request.setCharacterEncoding("UTF-8");
+%>
 
-<%!-- ===== Modèle dans CE fichier ===== --%>
+<%-- ===== Modèle dans CE fichier ===== --%>
 <%!
+    // Classe simple pour une tâche (POJO)
     class Task {
         private String title, description, dueDate;
         private boolean done;
+
         public Task(String title, String description, String dueDate) {
             this.title = title;
             this.description = description;
@@ -20,9 +24,10 @@
     }
 %>
 
+<%-- ===== Logique serveur dans CE fichier ===== --%>
 <%
-    // ===== Logique serveur dans CE fichier =====
-    java.util.ArrayList<Task> tasks = (java.util.ArrayList<Task>) session.getAttribute("tasks");
+    java.util.ArrayList<Task> tasks =
+        (java.util.ArrayList<Task>) session.getAttribute("tasks");
     if (tasks == null) {
         tasks = new java.util.ArrayList<Task>();
         session.setAttribute("tasks", tasks);
@@ -43,13 +48,17 @@
             String idxStr = request.getParameter("index");
             if (idxStr != null && idxStr.matches("\\d+")) {
                 int idx = Integer.parseInt(idxStr);
-                if (idx >= 0 && idx < tasks.size()) tasks.get(idx).toggleDone();
+                if (idx >= 0 && idx < tasks.size()) {
+                    tasks.get(idx).toggleDone();
+                }
             }
         } else if ("delete".equals(action)) {
             String idxStr = request.getParameter("index");
             if (idxStr != null && idxStr.matches("\\d+")) {
                 int idx = Integer.parseInt(idxStr);
-                if (idx >= 0 && idx < tasks.size()) tasks.remove(idx);
+                if (idx >= 0 && idx < tasks.size()) {
+                    tasks.remove(idx);
+                }
             }
         } else if ("clear".equals(action)) {
             tasks.clear();
@@ -130,5 +139,3 @@
 <% } %>
 </body>
 </html>
-
-
