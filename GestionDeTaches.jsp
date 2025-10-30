@@ -1,40 +1,33 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <% request.setCharacterEncoding("UTF-8"); %>
 
-<%!-- =========================
-     Gestion de tâches
-     ========================= --%>
+<%!-- ===== Modèle dans CE fichier ===== --%>
 <%!
-    // Classe simple pour une tâche (POJO)
     class Task {
-        private String title;
-        private String description;
-        private String dueDate; // au format texte AAAA-MM-JJ (simple)
+        private String title, description, dueDate;
         private boolean done;
-
         public Task(String title, String description, String dueDate) {
             this.title = title;
             this.description = description;
             this.dueDate = dueDate;
             this.done = false;
         }
-        public String getTitle()       { return title; }
+        public String getTitle() { return title; }
         public String getDescription() { return description; }
-        public String getDueDate()     { return dueDate; }
-        public boolean isDone()        { return done; }
-        public void toggleDone()       { done = !done; }
+        public String getDueDate() { return dueDate; }
+        public boolean isDone() { return done; }
+        public void toggleDone() { done = !done; }
     }
 %>
 
 <%
-    // Récupération/initialisation de la liste en session
+    // ===== Logique serveur dans CE fichier =====
     java.util.ArrayList<Task> tasks = (java.util.ArrayList<Task>) session.getAttribute("tasks");
     if (tasks == null) {
         tasks = new java.util.ArrayList<Task>();
         session.setAttribute("tasks", tasks);
     }
 
-    // On créer un fichier afin de traiter l'action postée
     String action = request.getParameter("action");
     if (action != null) {
         if ("add".equals(action)) {
@@ -62,44 +55,38 @@
             tasks.clear();
         }
     }
-
-    String self = request.getRequestURI();
 %>
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
-<title>Gestion de tâches</title>
+<title>Gestion de tâches (1 seul JSP)</title>
 <style>
     body { font-family: Arial, sans-serif; margin: 24px; }
-    h1 { margin: 0 0 4px 0; }
-    .hint { color:#666; margin: 0 0 16px 0; }
-    form { margin: 12px 0; }
-    input[type=text], input[type=date], textarea { width: 100%; max-width: 520px; }
     table { border-collapse: collapse; width: 100%; max-width: 820px; margin-top: 12px; }
     th, td { border: 1px solid #ccc; padding: 8px; vertical-align: top; }
     .done { text-decoration: line-through; color: #777; }
     .actions form { display: inline; margin: 0 4px; }
+    input[type=text], input[type=date], textarea { width: 100%; max-width: 520px; }
 </style>
 </head>
 <body bgcolor="white">
 <h1>Gestion de tâches</h1>
 
-<!-- Formulaire d'ajout -->
 <h2>Ajouter une tâche</h2>
-<form action="<%= self %>" method="post">
+<form action="GestionDeTaches.jsp" method="post">
     <input type="hidden" name="action" value="add"/>
-    <p><label>Titre</label><br/>
-       <input type="text" name="title" required placeholder="Ex. Réviser le DS de M.STOCKER"></p>
+    <p><label>Titre (obligatoire)</label><br/>
+       <input type="text" name="title" required placeholder="Ex. Réviser DS Java"></p>
     <p><label>Description</label><br/>
-       <textarea name="description" rows="3" placeholder="Ex. Pour échapper aux sessions de rattrapage... XD"></textarea></p>
+       <textarea name="description" rows="3" placeholder="Détails facultatifs"></textarea></p>
     <p><label>Échéance</label><br/>
        <input type="date" name="dueDate"></p>
     <p><input type="submit" value="Ajouter"></p>
 </form>
 
-<form action="<%= self %>" method="post" onsubmit="return confirm('Effacer toutes les tâches ?');">
+<form action="GestionDeTaches.jsp" method="post" onsubmit="return confirm('Effacer toutes les tâches ?');">
     <input type="hidden" name="action" value="clear"/>
     <input type="submit" value="Tout effacer">
 </form>
@@ -124,13 +111,13 @@
         <td><%= done ? "Terminée" : "En cours" %></td>
         <td class="actions">
             <!-- Basculer terminé/en cours -->
-            <form action="<%= self %>" method="post" style="display:inline;">
+            <form action="GestionDeTaches.jsp" method="post" style="display:inline;">
                 <input type="hidden" name="action" value="toggle"/>
                 <input type="hidden" name="index"  value="<%= i %>"/>
                 <input type="submit" value="<%= done ? "Remettre en cours" : "Marquer terminée" %>"/>
             </form>
             <!-- Supprimer -->
-            <form action="<%= self %>" method="post" style="display:inline;"
+            <form action="GestionDeTaches.jsp" method="post" style="display:inline;"
                   onsubmit="return confirm('Supprimer cette tâche ?');">
                 <input type="hidden" name="action" value="delete"/>
                 <input type="hidden" name="index"  value="<%= i %>"/>
