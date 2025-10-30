@@ -96,7 +96,7 @@
 <form action="taches.jsp" method="post">
     <input type="hidden" name="action" value="add"/>
     <p>
-        <label>Titre (obligatoire) :</label><br/>
+        <label>Titre :</label><br/>
         <input type="text" name="title" placeholder="Ex. Réviser DS de M.STOCKER" required/>
     </p>
     <p>
