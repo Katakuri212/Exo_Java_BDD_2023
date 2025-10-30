@@ -1,169 +1,224 @@
-<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<% request.setCharacterEncoding("UTF-8"); %>
-<%-- =========================
-     Mini Gestionnaire de Tâches - 1 seul JSP
-     ========================= --%>
-
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
+    import="java.util.*, java.time.*, java.time.format.DateTimeParseException, java.io.*, java.util.stream.*" %>
+<%-- ======================= LOGIQUE SERVEUR (tout-en-un) ======================= --%>
 <%!
-    // ---- Modèle : classe Task (POJO simple)
-    class Task {
+    // Modèle de donnée dans la page (OK pour un TP / démo)
+    public static class Task implements Serializable {
+        private final String id;
         private String title;
         private String description;
-        private String dueDate;   // stockée en texte pour rester simple (AAAA-MM-JJ)
+        private LocalDate dueDate;
         private boolean done;
 
-        public Task(String title, String description, String dueDate) {
+        public Task(String title, String description, LocalDate dueDate) {
+            this.id = java.util.UUID.randomUUID().toString();
             this.title = title;
             this.description = description;
             this.dueDate = dueDate;
             this.done = false;
         }
-        public String getTitle()       { return title; }
+        public String getId() { return id; }
+        public String getTitle() { return title; }
         public String getDescription() { return description; }
-        public String getDueDate()     { return dueDate; }
-        public boolean isDone()        { return done; }
-        public void toggleDone()       { this.done = !this.done; }
+        public LocalDate getDueDate() { return dueDate; }
+        public boolean isDone() { return done; }
+        public void setTitle(String t){ this.title=t; }
+        public void setDescription(String d){ this.description=d; }
+        public void setDueDate(LocalDate d){ this.dueDate=d; }
+        public void setDone(boolean v){ this.done=v; }
+    }
+
+    // Outil d'affichage sûr (éviter balises HTML dans le contenu utilisateur)
+    private static String esc(String s){
+        if (s == null) return "";
+        return s.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+                .replace("\"","&quot;").replace("'","&#39;");
     }
 %>
-
 <%
-    // ---- Récupérer/initialiser la liste de tâches dans la session
-    java.util.ArrayList<Task> tasks =
-        (java.util.ArrayList<Task>) session.getAttribute("tasks");
+    request.setCharacterEncoding("UTF-8");
+
+    // Récupère/initialise la liste en session
+    @SuppressWarnings("unchecked")
+    List<Task> tasks = (List<Task>) session.getAttribute("tasks");
     if (tasks == null) {
-        tasks = new java.util.ArrayList<Task>();
+        tasks = new ArrayList<>();
         session.setAttribute("tasks", tasks);
     }
 
-    // ---- Récupérer l'action et exécuter
+    // Router minimal via paramètres
     String action = request.getParameter("action");
-    if (action != null) {
-        if ("add".equals(action)) {
-            String title = request.getParameter("title");
-            String desc  = request.getParameter("description");
-            String due   = request.getParameter("dueDate");
-            // mini-validation : titre obligatoire (le reste optionnel)
-            if (title != null && !title.trim().isEmpty()) {
-                tasks.add(new Task(title.trim(),
-                                   (desc == null ? "" : desc.trim()),
-                                   (due  == null ? "" : due.trim())));
-            }
-        } else if ("delete".equals(action)) {
-            String idxStr = request.getParameter("index");
-            if (idxStr != null && idxStr.matches("\\d+")) {
-                int idx = Integer.parseInt(idxStr);
-                if (idx >= 0 && idx < tasks.size()) {
-                    tasks.remove(idx);
-                }
-            }
-        } else if ("toggle".equals(action)) {
-            String idxStr = request.getParameter("index");
-            if (idxStr != null && idxStr.matches("\\d+")) {
-                int idx = Integer.parseInt(idxStr);
-                if (idx >= 0 && idx < tasks.size()) {
-                    tasks.get(idx).toggleDone();
-                }
-            }
-        } else if ("clear".equals(action)) {
-            tasks.clear();
+    String method = request.getMethod(); // "GET" / "POST"
+
+    if ("POST".equalsIgnoreCase(method) && "add".equals(action)) {
+        String title = request.getParameter("title");
+        String description = request.getParameter("description");
+        String due = request.getParameter("dueDate");
+        LocalDate dueDate = null;
+        if (due != null && !due.isBlank()) {
+            try { dueDate = LocalDate.parse(due); } catch (DateTimeParseException e) { /* ignore */ }
         }
-        // rien d’autre à faire : on retombe sur l’affichage plus bas
+        if (title != null && !title.isBlank()) {
+            tasks.add(new Task(title.trim(), description == null ? "" : description.trim(), dueDate));
+        }
+        // PRG: éviter le re-submit sur F5
+        response.sendRedirect(request.getRequestURI());
+        return;
+    }
+
+    if ("toggle".equals(action)) {
+        String id = request.getParameter("id");
+        if (id != null) {
+            for (Task t : tasks) {
+                if (t.getId().equals(id)) { t.setDone(!t.isDone()); break; }
+            }
+        }
+        response.sendRedirect(request.getRequestURI());
+        return;
+    }
+
+    if ("delete".equals(action)) {
+        String id = request.getParameter("id");
+        if (id != null) {
+            tasks.removeIf(t -> t.getId().equals(id));
+        }
+        response.sendRedirect(request.getRequestURI());
+        return;
+    }
+
+    // Optionnel: tri simple via ?sort=due|title|status
+    String sort = request.getParameter("sort");
+    if (sort != null) {
+        Comparator<Task> cmp;
+        switch (sort) {
+            case "title":
+                cmp = Comparator.comparing(t -> Optional.ofNullable(t.getTitle()).orElse(""));
+                break;
+            case "status":
+                cmp = Comparator.comparing(Task::isDone).thenComparing(t -> Optional.ofNullable(t.getTitle()).orElse(""));
+                break;
+            case "due":
+            default:
+                cmp = Comparator.comparing((Task t) -> Optional.ofNullable(t.getDueDate()).orElse(LocalDate.MAX))
+                        .thenComparing(t -> Optional.ofNullable(t.getTitle()).orElse(""));
+        }
+        tasks.sort(cmp);
     }
 %>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8"/>
-    <title>Mini Gestionnaire de Tâches (JSP)</title>
+    <meta charset="UTF-8">
+    <title>Gestion de Tâches — Single JSP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { font-family: Arial, sans-serif; margin: 24px; }
-        h1 { margin-bottom: 8px; }
-        form { margin: 12px 0; }
-        input[type=text], input[type=date], textarea { width: 100%; max-width: 520px; }
-        table { border-collapse: collapse; margin-top: 12px; width: 100%; max-width: 820px; }
-        th, td { border: 1px solid #ccc; padding: 8px; vertical-align: top; }
-        .done { text-decoration: line-through; color: #777; }
-        .actions form { display: inline; margin: 0 4px; }
-        .hint { color: #666; font-size: 0.9em; }
-        .row-title { font-weight: bold; }
+        :root{--fg:#222;--muted:#666;--b:#e9e9ef;--acc:#0a84ff;--ok:#0a0;--warn:#aa8c00;--bg:#fff}
+        *{box-sizing:border-box}
+        body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:32px;color:var(--fg);background:var(--bg)}
+        h1{margin:0 0 10px}
+        .wrap{max-width:980px;margin:0 auto}
+        .card{border:1px solid var(--b);border-radius:12px;padding:16px;margin:16px 0;background:#fff}
+        label{display:block;margin-top:10px;font-weight:600}
+        input[type=text], textarea, input[type=date]{
+            width:100%;padding:10px;border:1px solid var(--b);border-radius:8px;margin-top:6px
+        }
+        .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+        .btn{padding:10px 14px;border:1px solid var(--b);border-radius:8px;background:#f7f7f9;cursor:pointer;text-decoration:none;color:inherit}
+        .btn.primary{border-color:var(--acc);outline:1px solid var(--acc)}
+        .btn.danger{border-color:#d33;color:#b00}
+        table{border-collapse:collapse;width:100%}
+        th,td{border-bottom:1px solid var(--b);padding:10px;text-align:left;vertical-align:top}
+        th{background:#fafafa}
+        .badge{padding:2px 8px;border-radius:999px;border:1px solid var(--muted);font-size:12px}
+        .done{background:#eaffea;border-color:#0a0;color:#060}
+        .pending{background:#fff8e6;border-color:var(--warn);color:#7a5}
+        .muted{color:var(--muted)}
+        .topbar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:8px 0 16px}
+        .filters a{margin-right:8px}
+        .empty{padding:16px;border:1px dashed var(--b);border-radius:10px}
     </style>
 </head>
-<body bgcolor="white">
-<h1>Mini Gestionnaire de Tâches (JSP, une seule page)</h1>
-<p class="hint">Ajoutez des tâches, marquez-les comme terminées, supprimez-les. Les données sont conservées <strong>en session</strong>.</p>
+<body>
+<div class="wrap">
+    <div class="topbar">
+        <h1>Mini Gestionnaire de Tâches (une seule JSP)</h1>
+        <div class="filters">
+            <span class="muted">Trier :</span>
+            <a class="btn" href="?sort=due">Échéance</a>
+            <a class="btn" href="?sort=title">Titre</a>
+            <a class="btn" href="?sort=status">Statut</a>
+        </div>
+    </div>
 
-<!-- ==== Formulaire d'ajout ==== -->
-<h2>Ajouter une tâche</h2>
-<form action="taches.jsp" method="post">
-    <input type="hidden" name="action" value="add"/>
-    <p>
-        <label>Titre (obligatoire) :</label><br/>
-        <input type="text" name="title" placeholder="Ex. Réviser DS Java" required/>
-    </p>
-    <p>
-        <label>Description :</label><br/>
-        <textarea name="description" rows="3" placeholder="Détails facultatifs"></textarea>
-    </p>
-    <p>
-        <label>Date d’échéance :</label><br/>
-        <input type="date" name="dueDate"/>
-    </p>
-    <p>
-        <input type="submit" value="Ajouter la tâche"/>
-    </p>
-</form>
+    <div class="card">
+        <h2>Ajouter une tâche</h2>
+        <form method="post">
+            <input type="hidden" name="action" value="add"/>
+            <label>Titre
+                <input type="text" name="title" required />
+            </label>
+            <label>Description
+                <textarea name="description" rows="3"></textarea>
+            </label>
+            <label>Échéance
+                <input type="date" name="dueDate" />
+            </label>
+            <div class="row" style="margin-top:12px">
+                <button class="btn primary" type="submit">Enregistrer</button>
+                <button class="btn" type="reset">Réinitialiser</button>
+            </div>
+        </form>
+    </div>
 
-<!-- ==== Bouton pour tout effacer ==== -->
-<form action="GestionDeTaches.jsp" method="post" onsubmit="return confirm('Effacer toutes les tâches ?');">
-    <input type="hidden" name="action" value="clear"/>
-    <input type="submit" value="Effacer toutes les tâches"/>
-</form>
-
-<!-- ==== Liste des tâches ==== -->
-<h2>Mes tâches (<%= tasks.size() %>)</h2>
-
-<% if (tasks.isEmpty()) { %>
-    <p>Aucune tâche pour le moment.</p>
-<% } else { %>
-    <table>
-        <tr>
-            <th>#</th>
-            <th>Titre</th>
-            <th>Description</th>
-            <th>Échéance</th>
-            <th>Statut</th>
-            <th>Actions</th>
-        </tr>
-        <% for (int i = 0; i < tasks.size(); i++) {
-               Task t = tasks.get(i);
-               boolean done = t.isDone();
+    <div class="card">
+        <h2>Mes tâches</h2>
+        <%
+            if (tasks.isEmpty()) {
         %>
+            <div class="empty">Aucune tâche pour le moment. Ajoute-en une ci-dessus.</div>
+        <%
+            } else {
+        %>
+        <table>
+            <thead>
             <tr>
-                <td><%= i %></td>
-                <td class="row-title <%= done ? "done" : "" %>"><%= t.getTitle() %></td>
-                <td class="<%= done ? "done" : "" %>"><%= t.getDescription() %></td>
-                <td class="<%= done ? "done" : "" %>"><%= (t.getDueDate()==null?"":t.getDueDate()) %></td>
-                <td><%= done ? "Terminée" : "En cours" %></td>
-                <td class="actions">
-                    <!-- Basculer terminé / en cours -->
-                    <form action="GestionDeTaches.jsp" method="post" style="display:inline;">
-                        <input type="hidden" name="action" value="toggle"/>
-                        <input type="hidden" name="index" value="<%= i %>"/>
-                        <input type="submit" value="<%= done ? "Remettre en cours" : "Marquer terminée" %>"/>
-                    </form>
-                    <!-- Supprimer -->
-                    <form action="GestionDeTaches.jsp" method="post" style="display:inline;" 
-                          onsubmit="return confirm('Supprimer cette tâche ?');">
-                        <input type="hidden" name="action" value="delete"/>
-                        <input type="hidden" name="index" value="<%= i %>"/>
-                        <input type="submit" value="Supprimer"/>
-                    </form>
-                </td>
+                <th style="width:22%">Titre</th>
+                <th style="width:38%">Description</th>
+                <th style="width:15%">Échéance</th>
+                <th style="width:10%">Statut</th>
+                <th style="width:15%">Actions</th>
             </tr>
+            </thead>
+            <tbody>
+            <%
+                for (Task t : tasks) {
+                    String dueText = (t.getDueDate()==null) ? "—" : t.getDueDate().toString();
+            %>
+                <tr>
+                    <td><%= esc(t.getTitle()) %></td>
+                    <td><%= esc(t.getDescription()) %></td>
+                    <td><%= dueText %></td>
+                    <td>
+                        <% if (t.isDone()) { %>
+                            <span class="badge done">Terminée</span>
+                        <% } else { %>
+                            <span class="badge pending">En cours</span>
+                        <% } %>
+                    </td>
+                    <td class="row" style="gap:6px">
+                        <a class="btn" href="?action=toggle&id=<%= t.getId() %>">Basculer</a>
+                        <a class="btn danger" href="?action=delete&id=<%= t.getId() %>"
+                           onclick="return confirm('Supprimer cette tâche ?');">Supprimer</a>
+                    </td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table>
         <% } %>
-    </table>
-<% } %>
+    </div>
 
+    <p class="muted">Stockage: session HTTP (ArrayList&lt;Task&gt;). Aucun servlet ni base de données.</p>
+</div>
 </body>
 </html>
+
