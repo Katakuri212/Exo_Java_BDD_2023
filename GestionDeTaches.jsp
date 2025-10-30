@@ -1,14 +1,15 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <% request.setCharacterEncoding("UTF-8"); %>
-<%-- =========================
-     Gestionnaire de Tâches
-     ========================= --%>
 
+<%!-- =========================
+     Gestion de tâches
+     ========================= --%>
 <%!
+    // Classe simple pour une tâche (POJO)
     class Task {
         private String title;
         private String description;
-        private String dueDate;   // stockée en texte pour rester simple (AAAA-MM-JJ)
+        private String dueDate; // au format texte AAAA-MM-JJ (simple)
         private boolean done;
 
         public Task(String title, String description, String dueDate) {
@@ -21,108 +22,91 @@
         public String getDescription() { return description; }
         public String getDueDate()     { return dueDate; }
         public boolean isDone()        { return done; }
-        public void toggleDone()       { this.done = !this.done; }
+        public void toggleDone()       { done = !done; }
     }
 %>
 
 <%
-    // ---- Récupérer/initialiser la liste de tâches dans la session
-    java.util.ArrayList<Task> tasks =
-        (java.util.ArrayList<Task>) session.getAttribute("tasks");
+    // Récupération/initialisation de la liste en session
+    java.util.ArrayList<Task> tasks = (java.util.ArrayList<Task>) session.getAttribute("tasks");
     if (tasks == null) {
         tasks = new java.util.ArrayList<Task>();
         session.setAttribute("tasks", tasks);
     }
 
-    // ---- Récupérer l'action et exécuter
+    // On créer un fichier afin de traiter l'action postée
     String action = request.getParameter("action");
     if (action != null) {
         if ("add".equals(action)) {
             String title = request.getParameter("title");
             String desc  = request.getParameter("description");
             String due   = request.getParameter("dueDate");
-            // mini-validation : titre obligatoire (le reste optionnel)
             if (title != null && !title.trim().isEmpty()) {
                 tasks.add(new Task(title.trim(),
-                                   (desc == null ? "" : desc.trim()),
-                                   (due  == null ? "" : due.trim())));
-            }
-        } else if ("delete".equals(action)) {
-            String idxStr = request.getParameter("index");
-            if (idxStr != null && idxStr.matches("\\d+")) {
-                int idx = Integer.parseInt(idxStr);
-                if (idx >= 0 && idx < tasks.size()) {
-                    tasks.remove(idx);
-                }
+                                   desc == null ? "" : desc.trim(),
+                                   due  == null ? "" : due.trim()));
             }
         } else if ("toggle".equals(action)) {
             String idxStr = request.getParameter("index");
             if (idxStr != null && idxStr.matches("\\d+")) {
                 int idx = Integer.parseInt(idxStr);
-                if (idx >= 0 && idx < tasks.size()) {
-                    tasks.get(idx).toggleDone();
-                }
+                if (idx >= 0 && idx < tasks.size()) tasks.get(idx).toggleDone();
+            }
+        } else if ("delete".equals(action)) {
+            String idxStr = request.getParameter("index");
+            if (idxStr != null && idxStr.matches("\\d+")) {
+                int idx = Integer.parseInt(idxStr);
+                if (idx >= 0 && idx < tasks.size()) tasks.remove(idx);
             }
         } else if ("clear".equals(action)) {
             tasks.clear();
         }
     }
+
+    String self = request.getRequestURI();
 %>
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8"/>
-    <title>Gestionnaire de Tâches</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 24px; }
-        h1 { margin-bottom: 8px; }
-        form { margin: 12px 0; }
-        input[type=text], input[type=date], textarea { width: 100%; max-width: 520px; }
-        table { border-collapse: collapse; margin-top: 12px; width: 100%; max-width: 820px; }
-        th, td { border: 1px solid #ccc; padding: 8px; vertical-align: top; }
-        .done { text-decoration: line-through; color: #777; }
-        .actions form { display: inline; margin: 0 4px; }
-        .hint { color: #666; font-size: 0.9em; }
-        .row-title { font-weight: bold; }
-    </style>
+<meta charset="UTF-8"/>
+<title>Gestion de tâches</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 24px; }
+    h1 { margin: 0 0 4px 0; }
+    .hint { color:#666; margin: 0 0 16px 0; }
+    form { margin: 12px 0; }
+    input[type=text], input[type=date], textarea { width: 100%; max-width: 520px; }
+    table { border-collapse: collapse; width: 100%; max-width: 820px; margin-top: 12px; }
+    th, td { border: 1px solid #ccc; padding: 8px; vertical-align: top; }
+    .done { text-decoration: line-through; color: #777; }
+    .actions form { display: inline; margin: 0 4px; }
+</style>
 </head>
 <body bgcolor="white">
-<h1>Gestionnaire de Tâches</h1>
-<p class="hint">Ajoutez des tâches, marquez-les comme terminées, supprimez-les. Les données sont conservées <strong>en session</strong>.</p>
+<h1>Gestion de tâches</h1>
 
-<!-- ==== Formulaire d'ajout ==== -->
+<!-- Formulaire d'ajout -->
 <h2>Ajouter une tâche</h2>
-<form action="taches.jsp" method="post">
+<form action="<%= self %>" method="post">
     <input type="hidden" name="action" value="add"/>
-    <p>
-        <label>Titre :</label><br/>
-        <input type="text" name="title" placeholder="Ex. Réviser DS de M.STOCKER" required/>
-    </p>
-    <p>
-        <label>Description :</label><br/>
-        <textarea name="description" rows="3" placeholder="Ex. Pour échapper aux sessions de rattrapage... XD "></textarea>
-    </p>
-    <p>
-        <label>Date d’échéance :</label><br/>
-        <input type="date" name="dueDate"/>
-    </p>
-    <p>
-        <input type="submit" value="Ajouter la tâche"/>
-    </p>
+    <p><label>Titre</label><br/>
+       <input type="text" name="title" required placeholder="Ex. Réviser le DS de M.STOCKER"></p>
+    <p><label>Description</label><br/>
+       <textarea name="description" rows="3" placeholder="Ex. Pour échapper aux sessions de rattrapage... XD"></textarea></p>
+    <p><label>Échéance</label><br/>
+       <input type="date" name="dueDate"></p>
+    <p><input type="submit" value="Ajouter"></p>
 </form>
 
-<!-- ==== Bouton pour tout effacer ==== -->
-<form action="taches.jsp" method="post" onsubmit="return confirm('Effacer toutes les tâches ?');">
+<form action="<%= self %>" method="post" onsubmit="return confirm('Effacer toutes les tâches ?');">
     <input type="hidden" name="action" value="clear"/>
-    <input type="submit" value="Effacer toutes les tâches"/>
+    <input type="submit" value="Tout effacer">
 </form>
 
-<!-- ==== Liste des tâches ==== -->
 <h2>Mes tâches (<%= tasks.size() %>)</h2>
-
 <% if (tasks.isEmpty()) { %>
-    <p>Aucune tâche pour le moment</p>
+    <p>Aucune tâche.</p>
 <% } else { %>
 <table>
     <tr>
