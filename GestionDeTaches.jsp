@@ -6,47 +6,48 @@
 
 <%!
     class Task {
-        private String titre;
+        private String title;
         private String description;
-        private String date;   
-        private boolean terminer;
+        private String dueDate;   // stockée en texte pour rester simple (AAAA-MM-JJ)
+        private boolean done;
 
-        public Task(String titre, String description, String date) {
-            Usertitle = titre;
-            Userdescription = description;
-            UserdueDate = date;
-            Userdone = false;
+        public Task(String title, String description, String dueDate) {
+            this.title = title;
+            this.description = description;
+            this.dueDate = dueDate;
+            this.done = false;
         }
-        public String getTitre()       { return titre; }
+        public String getTitle()       { return title; }
         public String getDescription() { return description; }
-        public String getDate()     { return date; }
-        public boolean isTerminer()        { return terminer; }
-        public void toggleTerminer()       { Userdone = !Userdone; }
+        public String getDueDate()     { return dueDate; }
+        public boolean isDone()        { return done; }
+        public void toggleDone()       { this.done = !this.done; }
     }
 %>
 
 <%
-// ---- Récupérer/initialiser la liste de tâches dans la session
+    // ---- Récupérer/initialiser la liste de tâches dans la session
     java.util.ArrayList<Task> tasks =
         (java.util.ArrayList<Task>) session.getAttribute("tasks");
     if (tasks == null) {
         tasks = new java.util.ArrayList<Task>();
         session.setAttribute("tasks", tasks);
     }
-// ---- Récupérer l'action et exécuter
+
+    // ---- Récupérer l'action et exécuter
     String action = request.getParameter("action");
     if (action != null) {
         if ("add".equals(action)) {
-            String titre = request.getParameter("titre");
+            String title = request.getParameter("title");
             String desc  = request.getParameter("description");
-            String due   = request.getParameter("date");
-            // validation des entrées utilisateur
-            if (titre != null && !titre.trim().isEmpty()) {
-                tasks.add(new Task(titre.trim(),
+            String due   = request.getParameter("dueDate");
+            // mini-validation : titre obligatoire (le reste optionnel)
+            if (title != null && !title.trim().isEmpty()) {
+                tasks.add(new Task(title.trim(),
                                    (desc == null ? "" : desc.trim()),
                                    (due  == null ? "" : due.trim())));
             }
-        } else if ("supprimer".equals(action)) {
+        } else if ("delete".equals(action)) {
             String idxStr = request.getParameter("index");
             if (idxStr != null && idxStr.matches("\\d+")) {
                 int idx = Integer.parseInt(idxStr);
@@ -54,7 +55,7 @@
                     tasks.remove(idx);
                 }
             }
-        } else if ("basculer".equals(action)) {
+        } else if ("toggle".equals(action)) {
             String idxStr = request.getParameter("index");
             if (idxStr != null && idxStr.matches("\\d+")) {
                 int idx = Integer.parseInt(idxStr);
@@ -62,18 +63,17 @@
                     tasks.get(idx).toggleDone();
                 }
             }
-        } else if ("toutSupp".equals(action)) {
+        } else if ("clear".equals(action)) {
             tasks.clear();
         }
     }
 %>
 
-// ---- Partie affichage HTML 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8"/>
-    <title> Gestionnaire de Tâches </title>
+    <title>Gestionnaire de Tâches</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 24px; }
         h1 { margin-bottom: 8px; }
@@ -88,7 +88,7 @@
     </style>
 </head>
 <body bgcolor="white">
-<h1> Gestionnaire de Tâches </h1>
+<h1>Gestionnaire de Tâches</h1>
 <p class="hint">Ajoutez des tâches, marquez-les comme terminées, supprimez-les. Les données sont conservées <strong>en session</strong>.</p>
 
 <!-- ==== Formulaire d'ajout ==== -->
@@ -97,7 +97,7 @@
     <input type="hidden" name="action" value="add"/>
     <p>
         <label>Titre (obligatoire) :</label><br/>
-        <input type="text" name="titre" placeholder="Ex. Réviser DS de M.STOCKER" required/>
+        <input type="text" name="title" placeholder="Ex. Réviser DS Java" required/>
     </p>
     <p>
         <label>Description :</label><br/>
@@ -105,7 +105,7 @@
     </p>
     <p>
         <label>Date d’échéance :</label><br/>
-        <input type="date" name="date"/>
+        <input type="date" name="dueDate"/>
     </p>
     <p>
         <input type="submit" value="Ajouter la tâche"/>
@@ -114,7 +114,7 @@
 
 <!-- ==== Bouton pour tout effacer ==== -->
 <form action="taches.jsp" method="post" onsubmit="return confirm('Effacer toutes les tâches ?');">
-    <input type="hidden" name="action" value="toutSupp"/>
+    <input type="hidden" name="action" value="clear"/>
     <input type="submit" value="Effacer toutes les tâches"/>
 </form>
 
@@ -135,25 +135,25 @@
         </tr>
         <% for (int i = 0; i < tasks.size(); i++) {
                Task t = tasks.get(i);
-               boolean terminer = t.isTerminer();
+               boolean done = t.isDone();
         %>
             <tr>
                 <td><%= i %></td>
-                <td class="row-title <%= terminer ? "done" : "" %>"><%= t.getTitre() %></td>
-                <td class="<%= terminer ? "done" : "" %>"><%= t.getDescription() %></td>
-                <td class="<%= terminer ? "done" : "" %>"><%= (t.getDate()==null?"":t.getDate()) %></td>
-                <td><%= terminer ? "Terminée" : "En cours" %></td>
+                <td class="row-title <%= done ? "done" : "" %>"><%= t.getTitle() %></td>
+                <td class="<%= done ? "done" : "" %>"><%= t.getDescription() %></td>
+                <td class="<%= done ? "done" : "" %>"><%= (t.getDueDate()==null?"":t.getDueDate()) %></td>
+                <td><%= done ? "Terminée" : "En cours" %></td>
                 <td class="actions">
                     <!-- Basculer terminé / en cours -->
                     <form action="taches.jsp" method="post" style="display:inline;">
-                        <input type="hidden" name="action" value="basculer"/>
+                        <input type="hidden" name="action" value="toggle"/>
                         <input type="hidden" name="index" value="<%= i %>"/>
-                        <input type="submit" value="<%= terminer ? "Remettre en cours" : "Marquer terminée" %>"/>
+                        <input type="submit" value="<%= done ? "Remettre en cours" : "Marquer terminée" %>"/>
                     </form>
                     <!-- Supprimer -->
                     <form action="taches.jsp" method="post" style="display:inline;" 
                           onsubmit="return confirm('Supprimer cette tâche ?');">
-                        <input type="hidden" name="action" value="supprimer"/>
+                        <input type="hidden" name="action" value="delete"/>
                         <input type="hidden" name="index" value="<%= i %>"/>
                         <input type="submit" value="Supprimer"/>
                     </form>
@@ -165,4 +165,3 @@
 
 </body>
 </html>
-
