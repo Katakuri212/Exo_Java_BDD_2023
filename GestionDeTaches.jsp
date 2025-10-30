@@ -115,7 +115,7 @@
 </form>
 
 <!-- ==== Bouton pour tout effacer ==== -->
-<form action="taches.jsp" method="post" onsubmit="return confirm('Effacer toutes les tâches ?');">
+<form action="GestionDeTaches.jsp" method="post" onsubmit="return confirm('Effacer toutes les tâches ?');">
     <input type="hidden" name="action" value="clear"/>
     <input type="submit" value="Effacer toutes les tâches"/>
 </form>
@@ -147,13 +147,13 @@
                 <td><%= done ? "Terminée" : "En cours" %></td>
                 <td class="actions">
                     <!-- Basculer terminé / en cours -->
-                    <form action="taches.jsp" method="post" style="display:inline;">
+                    <form action="GestionDeTaches.jsp" method="post" style="display:inline;">
                         <input type="hidden" name="action" value="toggle"/>
                         <input type="hidden" name="index" value="<%= i %>"/>
                         <input type="submit" value="<%= done ? "Remettre en cours" : "Marquer terminée" %>"/>
                     </form>
                     <!-- Supprimer -->
-                    <form action="taches.jsp" method="post" style="display:inline;" 
+                    <form action="GestionDeTaches.jsp" method="post" style="display:inline;" 
                           onsubmit="return confirm('Supprimer cette tâche ?');">
                         <input type="hidden" name="action" value="delete"/>
                         <input type="hidden" name="index" value="<%= i %>"/>
