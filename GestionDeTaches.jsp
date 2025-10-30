@@ -101,7 +101,7 @@
 
 <h2>Mes tâches (<%= tasks.size() %>)</h2>
 <% if (tasks.isEmpty()) { %>
-    <p>Aucune tâche.</p>
+    <p>Aucune tâche pour le moment.</p>
 <% } else { %>
 <table>
     <tr>
