@@ -122,46 +122,40 @@
 <h2>Mes tâches (<%= tasks.size() %>)</h2>
 
 <% if (tasks.isEmpty()) { %>
-    <p>Aucune tâche pour le moment.</p>
+    <p>Aucune tâche pour le moment</p>
 <% } else { %>
-    <table>
-        <tr>
-            <th>#</th>
-            <th>Titre</th>
-            <th>Description</th>
-            <th>Échéance</th>
-            <th>Statut</th>
-            <th>Actions</th>
-        </tr>
-        <% for (int i = 0; i < tasks.size(); i++) {
-               Task t = tasks.get(i);
-               boolean done = t.isDone();
-        %>
-            <tr>
-                <td><%= i %></td>
-                <td class="row-title <%= done ? "done" : "" %>"><%= t.getTitle() %></td>
-                <td class="<%= done ? "done" : "" %>"><%= t.getDescription() %></td>
-                <td class="<%= done ? "done" : "" %>"><%= (t.getDueDate()==null?"":t.getDueDate()) %></td>
-                <td><%= done ? "Terminée" : "En cours" %></td>
-                <td class="actions">
-                    <!-- Basculer terminé / en cours -->
-                    <form action="taches.jsp" method="post" style="display:inline;">
-                        <input type="hidden" name="action" value="toggle"/>
-                        <input type="hidden" name="index" value="<%= i %>"/>
-                        <input type="submit" value="<%= done ? "Remettre en cours" : "Marquer terminée" %>"/>
-                    </form>
-                    <!-- Supprimer -->
-                    <form action="taches.jsp" method="post" style="display:inline;" 
-                          onsubmit="return confirm('Supprimer cette tâche ?');">
-                        <input type="hidden" name="action" value="delete"/>
-                        <input type="hidden" name="index" value="<%= i %>"/>
-                        <input type="submit" value="Supprimer"/>
-                    </form>
-                </td>
-            </tr>
-        <% } %>
-    </table>
+<table>
+    <tr>
+        <th>#</th><th>Titre</th><th>Description</th><th>Échéance</th><th>Statut</th><th>Actions</th>
+    </tr>
+    <% for (int i = 0; i < tasks.size(); i++) {
+           Task t = tasks.get(i);
+           boolean done = t.isDone();
+    %>
+    <tr>
+        <td><%= i %></td>
+        <td class="<%= done ? "done" : "" %>"><%= t.getTitle() %></td>
+        <td class="<%= done ? "done" : "" %>"><%= t.getDescription() %></td>
+        <td class="<%= done ? "done" : "" %>"><%= t.getDueDate() %></td>
+        <td><%= done ? "Terminée" : "En cours" %></td>
+        <td class="actions">
+            <!-- Basculer terminé/en cours -->
+            <form action="<%= self %>" method="post" style="display:inline;">
+                <input type="hidden" name="action" value="toggle"/>
+                <input type="hidden" name="index"  value="<%= i %>"/>
+                <input type="submit" value="<%= done ? "Remettre en cours" : "Marquer terminée" %>"/>
+            </form>
+            <!-- Supprimer -->
+            <form action="<%= self %>" method="post" style="display:inline;"
+                  onsubmit="return confirm('Supprimer cette tâche ?');">
+                <input type="hidden" name="action" value="delete"/>
+                <input type="hidden" name="index"  value="<%= i %>"/>
+                <input type="submit" value="Supprimer"/>
+            </form>
+        </td>
+    </tr>
+    <% } %>
+</table>
 <% } %>
-
 </body>
 </html>
