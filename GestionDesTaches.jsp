@@ -25,4 +25,12 @@
     }
 %>
 
+<%
+
+    java.util.ArrayList<Task> tasks =
+        (java.util.ArrayList<Task>) session.getAttribute("tasks");
+    if (tasks == null) {
+        tasks = new java.util.ArrayList<Task>();
+        session.setAttribute("tasks", tasks);
+    }
 
