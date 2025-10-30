@@ -5,24 +5,23 @@
      ========================= --%>
 
 <%!
-    // ---- Modèle : classe Task (POJO simple)
     class Task {
-        private String title;
+        private String titre;
         private String description;
-        private String dueDate;   // stockée en texte pour rester simple (AAAA-MM-JJ)
-        private boolean done;
+        private String date;   
+        private boolean terminer;
 
-        public Task(String title, String description, String dueDate) {
-            Usertitle = title;
+        public Task(String titre, String description, String date) {
+            Usertitle = titre;
             Userdescription = description;
-            UserdueDate = dueDate;
+            UserdueDate = date;
             Userdone = false;
         }
-        public String getTitle()       { return title; }
+        public String getTitre()       { return titre; }
         public String getDescription() { return description; }
-        public String getDueDate()     { return dueDate; }
-        public boolean isDone()        { return done; }
-        public void toggleDone()       { this.done = !this.done; }
+        public String getDate()     { return date; }
+        public boolean isTerminer()        { return terminer; }
+        public void toggleTerminer()       { Userdone = !Userdone; }
     }
 %>
 
