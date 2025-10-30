@@ -101,7 +101,7 @@
     </p>
     <p>
         <label>Description :</label><br/>
-        <textarea name="description" rows="3" placeholder="Détails facultatifs"></textarea>
+        <textarea name="description" rows="3" placeholder="Ex. Pour échapper aux sessions de rattrapage... XD "></textarea>
     </p>
     <p>
         <label>Date d’échéance :</label><br/>
