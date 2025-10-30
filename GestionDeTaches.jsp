@@ -3,9 +3,8 @@
     request.setCharacterEncoding("UTF-8");
 %>
 
-<%-- ===== Modèle dans CE fichier ===== --%>
 <%!
-    // Classe simple pour une tâche (POJO)
+    // Classe simple pour une tâche 
     class Task {
         private String title, description, dueDate;
         private boolean done;
@@ -24,7 +23,7 @@
     }
 %>
 
-<%-- ===== Logique serveur dans CE fichier ===== --%>
+
 <%
     java.util.ArrayList<Task> tasks =
         (java.util.ArrayList<Task>) session.getAttribute("tasks");
@@ -70,7 +69,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
-<title>Gestion de tâches (1 seul JSP)</title>
+<title>Gestion de tâches</title>
 <style>
     body { font-family: Arial, sans-serif; margin: 24px; }
     table { border-collapse: collapse; width: 100%; max-width: 820px; margin-top: 12px; }
@@ -86,10 +85,10 @@
 <h2>Ajouter une tâche</h2>
 <form action="GestionDeTaches.jsp" method="post">
     <input type="hidden" name="action" value="add"/>
-    <p><label>Titre (obligatoire)</label><br/>
-       <input type="text" name="title" required placeholder="Ex. Réviser DS Java"></p>
+    <p><label>Titre</label><br/>
+       <input type="text" name="title" required placeholder="Ex. Réviser le DS de M.STOCKER"></p>
     <p><label>Description</label><br/>
-       <textarea name="description" rows="3" placeholder="Détails facultatifs"></textarea></p>
+       <textarea name="description" rows="3" placeholder="Ex. Pour échapper aux sessions de rattrapage... XD"></textarea></p>
     <p><label>Échéance</label><br/>
        <input type="date" name="dueDate"></p>
     <p><input type="submit" value="Ajouter"></p>
