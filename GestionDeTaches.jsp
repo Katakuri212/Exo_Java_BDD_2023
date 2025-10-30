@@ -97,7 +97,7 @@
     <input type="hidden" name="action" value="add"/>
     <p>
         <label>Titre (obligatoire) :</label><br/>
-        <input type="text" name="title" placeholder="Ex. Réviser DS Java" required/>
+        <input type="text" name="title" placeholder="Ex. Réviser DS de M.STOCKER" required/>
     </p>
     <p>
         <label>Description :</label><br/>
